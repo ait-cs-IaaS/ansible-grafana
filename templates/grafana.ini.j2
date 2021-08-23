@@ -135,6 +135,72 @@ enabled = True
 mode = {{ grafana_log.mode | default('console, file') }}
 level = {{ grafana_log.level | default('info') }}
 
+{% if grafana_log.console is defined %}
+[log.console]
+
+level = {{ grafana_log.console.level | default(grafana_log.level | default('info')) }}
+
+format = {{ grafana_log.console.format | default('console') }}
+{% endif %}
+
+{% if grafana_log.file is defined %}
+[log.file]
+
+level = {{ grafana_log.file.level | default(grafana_log.level | default('info')) }}
+
+format = {{ grafana_log.file.format | default('text') }}
+
+log_rotate = {{ grafana_log.file.rotate | default('true') }}
+
+max_lines = {{ grafana_log.file.max_lines | default(1000000) }}
+
+max_size_shift = {{ grafana_log.file.max_size_shift | default(28) }}
+
+daily_rotate = {{ grafana_log.file.daily_rotate | default('true') }}
+
+max_days = {{ grafana_log.file.max_days | default(7) }}
+{% endif %}
+
+{% if grafana_log.syslog is defined %}
+[log.syslog]
+
+level = {{ grafana_log.syslog.level | default(grafana_log.level | default('info')) }}
+
+format = {{ grafana_log.syslog.format | default('text')  }}
+
+network = {{ grafana_log.syslog.network | default("") }}
+
+address = {{ grafana_log.syslog.address | default("") }}
+
+facility = {{ grafana_log.syslog.facility | default("") }}
+
+{% if grafana_log.syslog.tag is defined %}
+tag = {{ grafana_log.syslog.tag }}
+{% else %}
+;tag =
+{% endif %}
+{% endif %}
+
+{% if grafana_log.frontend is defined %}
+[log.frontend]
+
+enabled = {{ grafana_log.frontend.enabled | default("false") }}
+
+{% if grafana_log.frontend.sentry_dsn is defined %}
+sentry_dsn = {{ grafana_log.frontend.sentry_dsn }}
+{% else %}
+;sentry_dsn =
+{% endif %}
+
+custom_endpoint = {{ grafana_log.frontend.custom_endpoint | default("/log") }}
+
+sample_rate = {{ grafana_log.frontend.sample_rate | default(1) }}
+
+log_endpoint_requests_per_second_limit = {{ grafana_log.frontend.log_endpoint_requests_per_second_limit | default(3) }}
+
+log_endpoint_burst_limit = {{ grafana_log.frontend.log_endpoint_burst_limit | default(15) }}
+{% endif %}
+
 # Metrics
 {% if grafana_metrics != {} %}
 [metrics]
